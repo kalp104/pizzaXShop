@@ -38,12 +38,12 @@ public class ItemsViewModel
     public decimal? Taxpercentage { get; set; }
 
     [Required(ErrorMessage = "code is required")]
+    [RegularExpression(@"^[0-9]*$", ErrorMessage = "Code must be a number")]
     public int? Shortcode { get; set; }
 
     [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
     public string? Description { get; set; }
 
-    // File upload (not part of the Item model, handled separately in the controller)
     public IFormFile? UploadFiles { get; set; }
 
     public string? ImageUrl {get; set;}
