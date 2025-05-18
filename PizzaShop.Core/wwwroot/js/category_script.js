@@ -10,7 +10,7 @@ if (!window.categoryScriptsInitialized) {
     var currentPage = 1;
     var totalItems = window.totalItems || 0;
     var selectedCategory = null;
-    var selectedCategoryName ="";
+    var selectedCategoryName = "";
     var searchTerm = "";
     var selectedItemIds = [];
     var canEdit = window.canEdit;
@@ -97,42 +97,41 @@ if (!window.categoryScriptsInitialized) {
     }
     fetchCategories();
 
-    function updateFilterList(categories)
-    {
-        $("#selectedCategoryForAddItem").empty();
-        $("#selectedCategoryForAddItem").append('<option value="">Select Category</option>');
-        categories.forEach(function (category) {
-            var option = $('<option></option>')
-                .attr('value', category.categoryid)
-                .text(category.categoryname);
-            $("#selectedCategoryForAddItem").append(option);
-        });
+    function updateFilterList(categories) {
+      $("#selectedCategoryForAddItem").empty();
+      $("#selectedCategoryForAddItem").append('<option value="">Select Category</option>');
+      categories.forEach(function (category) {
+        var option = $('<option></option>')
+          .attr('value', category.categoryid)
+          .text(category.categoryname);
+        $("#selectedCategoryForAddItem").append(option);
+      });
     }
 
     function updateCategoryList(category) {
       var $sectionList = $("#Category-list");
       var $noSections = $("#no-categories");
       $sectionList.empty();
-    
+
       // If no categories, show "no categories" message and return
       if (category.length === 0) {
         $noSections.show();
         return;
       }
-    
+
       $noSections.hide();
-    
+
       // If no category is selected and there are categories, select the first one
       if (!selectedCategory && category.length > 0) {
         selectedCategory = category[0].categoryid;
       }
-    
+
       category.forEach(function (s) {
         // Determine if this category is active based on selectedCategory
         var isActive = s.categoryid === selectedCategory ? "active" : "";
         var textColor = s.categoryid === selectedCategory ? "text-white" : "text-dark";
         var pensVisible = s.categoryid === selectedCategory ? "" : "d-none";
-    
+
         // Build edit/delete buttons based on permissions
         var activePensHtml = "";
         if (canEdit) {
@@ -149,7 +148,7 @@ if (!window.categoryScriptsInitialized) {
             </a>`;
         }
         activePensHtml = `<div class="activePens ${pensVisible}">${activePensHtml}</div>`;
-    
+
         // Build the category HTML
         var sectionHtml = `
           <li class="nav-link links category-link d-flex justify-content-between align-items-center gap-2 ${isActive}"
@@ -189,7 +188,7 @@ if (!window.categoryScriptsInitialized) {
       $("#selectAllItemsCheckbox").prop(
         "checked",
         $checkboxes.length > 0 &&
-          $checkboxes.length === $checkboxes.filter(":checked").length
+        $checkboxes.length === $checkboxes.filter(":checked").length
       );
     }
 
@@ -246,24 +245,24 @@ if (!window.categoryScriptsInitialized) {
 
     // Category link click handler
     $(document).on("click", ".category-link", function (e) {
-        e.preventDefault();
-        $(".category-link").removeClass('active').find('a').removeClass('text-white').addClass('text-dark');
-        $('.activePens').addClass('d-none');
-        $(this).addClass('active').find('a').removeClass('text-dark').addClass('text-white');
-        $(this).find('.activePens').removeClass('d-none');
-        selectedCategory = $(this).data("category-id");
-        // console.log("Selected Category ID:", selectedCategory);
-        selectedCategoryName = $(this).data("category-name");
-        $('#selectedCategoryForAddItem').val(selectedCategory);
+      e.preventDefault();
+      $(".category-link").removeClass('active').find('a').removeClass('text-white').addClass('text-dark');
+      $('.activePens').addClass('d-none');
+      $(this).addClass('active').find('a').removeClass('text-dark').addClass('text-white');
+      $(this).find('.activePens').removeClass('d-none');
+      selectedCategory = $(this).data("category-id");
+      // console.log("Selected Category ID:", selectedCategory);
+      selectedCategoryName = $(this).data("category-name");
+      $('#selectedCategoryForAddItem').val(selectedCategory);
 
-        // console.log("Selected Category Name:", selectedCategoryName);
-        // $('#sectionIdAtAddTable').val(selectedSection);
-        // $('#sectionNameAtAddTable').val(selectedSectionName);
-        searchTerm = "";
-        currentPage = 1;
-        fetchItems(selectedCategory, searchTerm, currentPage, rowsPerPage);
-        selectedItemIds = [];
-        $("#searchInput").val("");
+      // console.log("Selected Category Name:", selectedCategoryName);
+      // $('#sectionIdAtAddTable').val(selectedSection);
+      // $('#sectionNameAtAddTable').val(selectedSectionName);
+      searchTerm = "";
+      currentPage = 1;
+      fetchItems(selectedCategory, searchTerm, currentPage, rowsPerPage);
+      selectedItemIds = [];
+      $("#searchInput").val("");
     });
 
     // Search input handler
@@ -311,7 +310,7 @@ if (!window.categoryScriptsInitialized) {
       $("#selectAllItemsCheckbox").prop(
         "checked",
         $checkboxes.length > 0 &&
-          $checkboxes.length === $checkboxes.filter(":checked").length
+        $checkboxes.length === $checkboxes.filter(":checked").length
       );
       updateDeleteButtonState();
     });
@@ -468,7 +467,7 @@ if (!window.categoryScriptsInitialized) {
             fetchItems(null, searchTerm, currentPage, rowsPerPage);
             openDeleteCategoryModal.hide();
             removeBackdrop();
-            
+
           } else {
             toastr.error(
               response.message || "Failed to delete category.",
@@ -599,51 +598,37 @@ if (!window.categoryScriptsInitialized) {
         let html = "";
         for (let groupId in selectedGroupsAdd) {
           let group = selectedGroupsAdd[groupId];
+          // Ensure minValue and maxValue default to 1 if undefined or invalid
+          group.minValue = group.minValue >= 1 ? group.minValue : 1;
+          group.maxValue = group.maxValue >= 1 ? group.maxValue : 1;
+
           html += `
-                        <div class="mb-3">
-                            <div class="px-3 d-flex justify-content-between">
-                                <div style="font-size:20px">${group.name}</div>
-                                <div class="trash-icon-add" style="font-size:20px; cursor:pointer" data-group-id="${groupId}">
-                                    <i class="bi bi-trash-fill"></i>
-                                </div>
-                            </div>
-                            <div class="px-3 pb-1 d-flex justify-content-between mt-1">
-                                <select class="form-select min-value-add" data-group-id="${groupId}" style="width: 80px;">
-                                    <option value="0" ${
-                                      group.minValue === 0 ? "selected" : ""
-                                    }>0</option>
-                                    <option value="1" ${
-                                      group.minValue === 1 ? "selected" : ""
-                                    }>1</option>
-                                    <option value="2" ${
-                                      group.minValue === 2 ? "selected" : ""
-                                    }>2</option>
-                                    <option value="3" ${
-                                      group.minValue === 3 ? "selected" : ""
-                                    }>3</option>
-                                </select>
-                                <select class="form-select max-value-add" data-group-id="${groupId}" style="width: 80px;">
-                                    <option value="0" ${
-                                      group.maxValue === 0 ? "selected" : ""
-                                    }>0</option>
-                                    <option value="1" ${
-                                      group.maxValue === 1 ? "selected" : ""
-                                    }>1</option>
-                                    <option value="2" ${
-                                      group.maxValue === 2 ? "selected" : ""
-                                    }>2</option>
-                                    <option value="3" ${
-                                      group.maxValue === 3 ? "selected" : ""
-                                    }>3</option>
-                                </select>
-                            </div>
-                            <ul>`;
+                <div class="mb-3">
+                    <div class="px-3 d-flex justify-content-between">
+                        <div style="font-size:20px">${group.name}</div>
+                        <div class="trash-icon-add" style="font-size:20px; cursor:pointer" data-group-id="${groupId}">
+                            <i class="bi bi-trash-fill"></i>
+                        </div>
+                    </div>
+                    <div class="px-3 pb-1 d-flex justify-content-between mt-1">
+                        <select class="form-select min-value-add" data-group-id="${groupId}" style="width: 80px;">
+                            <option value="1" ${group.minValue === 1 ? "selected" : ""}>1</option>
+                            <option value="2" ${group.minValue === 2 ? "selected" : ""}>2</option>
+                            <option value="3" ${group.minValue === 3 ? "selected" : ""}>3</option>
+                        </select>
+                        <select class="form-select max-value-add" data-group-id="${groupId}" style="width: 80px;">
+                            <option value="1" ${group.maxValue === 1 ? "selected" : ""}>1</option>
+                            <option value="2" ${group.maxValue === 2 ? "selected" : ""}>2</option>
+                            <option value="3" ${group.maxValue === 3 ? "selected" : ""}>3</option>
+                        </select>
+                    </div>
+                    <ul>`;
           group.modifiers.forEach(function (modifier) {
             html += `
-                            <li class="px-3 d-flex justify-content-between" style="font-size:14px" data-modifier-id="${modifier.modifierId}">
-                                <span>${modifier.modifiername}</span>
-                                <span>${modifier.modifierrate}</span>
-                            </li>`;
+                    <li class="px-3 d-flex justify-content-between" style="font-size:14px" data-modifier-id="${modifier.modifierId}">
+                        <span>${modifier.modifiername}</span>
+                        <span>${modifier.modifierrate}</span>
+                    </li>`;
           });
           html += `</ul></div>`;
         }
@@ -672,8 +657,8 @@ if (!window.categoryScriptsInitialized) {
           });
       } else {
         $("#modifiers-container-add").html(`
-                    <div class="p-2 m-2 alert alert-info">No modifier groups selected</div>
-                `);
+            <div class="p-2 m-2 alert alert-info">No modifier groups selected</div>
+        `);
       }
 
       $("#addItemForm .modifier-checkbox-add").each(function () {
@@ -879,54 +864,38 @@ if (!window.categoryScriptsInitialized) {
         for (let groupId in selectedGroupsEdit) {
           let group = selectedGroupsEdit[groupId];
           if (!group || !group.modifierGroupName) continue;
+          // Ensure minValue and maxValue default to 1 if undefined or invalid
+          group.minValue = group.minValue >= 1 ? group.minValue : 1;
+          group.maxValue = group.maxValue >= 1 ? group.maxValue : 1;
+
           html += `
-                        <div class="mb-3">
-                            <div class="px-3 d-flex justify-content-between">
-                                <div style="font-size:20px">${
-                                  group.modifierGroupName
-                                }</div>
-                                <div class="trash-icon-edit" style="font-size:20px; cursor:pointer" data-group-id="${groupId}">
-                                    <i class="bi bi-trash-fill"></i>
-                                </div>
-                            </div>
-                            <div class="px-3 pb-1 d-flex justify-content-between mt-1">
-                                <select class="form-select min-value-edit" data-group-id="${groupId}" style="width: 80px;">
-                                    <option value="0" ${
-                                      group.minValue === 0 ? "selected" : ""
-                                    }>0</option>
-                                    <option value="1" ${
-                                      group.minValue === 1 ? "selected" : ""
-                                    }>1</option>
-                                    <option value="2" ${
-                                      group.minValue === 2 ? "selected" : ""
-                                    }>2</option>
-                                    <option value="3" ${
-                                      group.minValue === 3 ? "selected" : ""
-                                    }>3</option>
-                                </select>
-                                <select class="form-select max-value-edit" data-group-id="${groupId}" style="width: 80px;">
-                                    <option value="0" ${
-                                      group.maxValue === 0 ? "selected" : ""
-                                    }>0</option>
-                                    <option value="1" ${
-                                      group.maxValue === 1 ? "selected" : ""
-                                    }>1</option>
-                                    <option value="2" ${
-                                      group.maxValue === 2 ? "selected" : ""
-                                    }>2</option>
-                                    <option value="3" ${
-                                      group.maxValue === 3 ? "selected" : ""
-                                    }>3</option>
-                                </select>
-                            </div>
-                            <ul>`;
+                <div class="mb-3">
+                    <div class="px-3 d-flex justify-content-between">
+                        <div style="font-size:20px">${group.modifierGroupName}</div>
+                        <div class="trash-icon-edit" style="font-size:20px; cursor:pointer" data-group-id="${groupId}">
+                            <i class="bi bi-trash-fill"></i>
+                        </div>
+                    </div>
+                    <div class="px-3 pb-1 d-flex justify-content-between mt-1">
+                        <select class="form-select min-value-edit" data-group-id="${groupId}" style="width: 80px;">
+                            <option value="1" ${group.minValue === 1 ? "selected" : ""}>1</option>
+                            <option value="2" ${group.minValue === 2 ? "selected" : ""}>2</option>
+                            <option value="3" ${group.minValue === 3 ? "selected" : ""}>3</option>
+                        </select>
+                        <select class="form-select max-value-edit" data-group-id="${groupId}" style="width: 80px;">
+                            <option value="1" ${group.maxValue === 1 ? "selected" : ""}>1</option>
+                            <option value="2" ${group.maxValue === 2 ? "selected" : ""}>2</option>
+                            <option value="3" ${group.maxValue === 3 ? "selected" : ""}>3</option>
+                        </select>
+                    </div>
+                    <ul>`;
           if (group.modifiers && Array.isArray(group.modifiers)) {
             group.modifiers.forEach(function (modifier) {
               html += `
-                                <li class="px-3 d-flex justify-content-between" style="font-size:14px" data-modifier-id="${modifier.modifierId}">
-                                    <span>${modifier.modifierName}</span>
-                                    <span>${modifier.modifierRate}</span>
-                                </li>`;
+                        <li class="px-3 d-flex justify-content-between" style="font-size:14px" data-modifier-id="${modifier.modifierId}">
+                            <span>${modifier.modifierName}</span>
+                            <span>${modifier.modifierRate}</span>
+                        </li>`;
             });
           }
           html += `</ul></div>`;

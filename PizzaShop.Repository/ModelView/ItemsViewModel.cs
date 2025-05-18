@@ -43,7 +43,7 @@ public class ItemsViewModel
 
     [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
     public string? Description { get; set; }
-
+    
     public IFormFile? UploadFiles { get; set; }
 
     public string? ImageUrl {get; set;}

@@ -14,7 +14,7 @@ $(document).ready(function () {
     var selectedModifierGroups = []; // Store selected modifier group IDs and names
 
     // Modal initialization
-   var openAddModifierModal = new bootstrap.Modal('#addModifiers');
+    var openAddModifierModal = new bootstrap.Modal('#addModifiers');
     var openDeleteModifierModal = new bootstrap.Modal('#staticBackdrop1-Modifier', { backdrop: 'static', keyboard: false });
     var openDeleteModifierGroupModal = new bootstrap.Modal('#delteModifierGroupModal', { backdrop: 'static', keyboard: false });
     var openAddModifierGroupModal = new bootstrap.Modal('#exampleModal1', { backdrop: 'static', keyboard: false });
@@ -120,7 +120,7 @@ $(document).ready(function () {
 
         if (!selectedCategoryMain && ModifierGroups.length > 0) {
             selectedCategoryMain = ModifierGroups[0].modifiergroupid;
-            var modifierGroupName =  ModifierGroups[0].modifierGroupName;
+            var modifierGroupName = ModifierGroups[0].modifierGroupName;
             selectedModifierGroups = [{ id: selectedCategoryMain, name: modifierGroupName }]; // Single selection
             $('#toggleModifiersGroupAdd').text(modifierGroupName);
 
@@ -409,12 +409,11 @@ $(document).ready(function () {
     $(document).off('submit', '#addModifierForm').on('submit', '#addModifierForm', function (e) {
         e.preventDefault();
         var formData = $(this).serialize();
-        if(selectedModifierGroups.length == 0)
-        {
+        if (selectedModifierGroups.length == 0) {
             $(".modifierNotSelected").removeClass("d-none");
             $(".modifierNotSelected").addClass("d-block");
             return;
-        }else{
+        } else {
             $(".modifierNotSelected").addClass("d-none");
             $(".modifierNotSelected").removeClass("d-block");
             $.ajax({
@@ -438,7 +437,7 @@ $(document).ready(function () {
                 }
             });
         }
-        
+
     });
 
     // Delete single modifier link handler
@@ -488,7 +487,6 @@ $(document).ready(function () {
     // Edit modifier submit
     $(document).off('submit', '#editModifierForm').on('submit', '#editModifierForm', function (e) {
         e.preventDefault();
-        console.log("Submitting edit modifier form");
         var form = $(this);
         var formData = new FormData(this);
 
@@ -496,33 +494,42 @@ $(document).ready(function () {
         var selectedGroups = $('#modifierGroupContainerEdit input[name="modifiersViewModel.Modifiergroupid"]:checked').map(function () {
             return $(this).val();
         }).get();
-        console.log("Selected modifier group IDs:", selectedGroups);
+        console.log("Selected Modifier Groups:", selectedGroups);
 
-        $.ajax({
-            url: '/Menu/EditModifier',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                console.log("Edit modifier response:", response);
-                if (response.success) {
-                    openUpdateModifierModal.hide();
-                    $("#modifierGroupContainerEdit").hide();
-                    $('#editModifierForm')[0].reset();
-                    $('#modifierGroupContainerEdit input[name="modifiersViewModel.Modifiergroupid"]').prop('checked', false);
-                    removeBackdrop();
-                    toastr.success(response.message || "Modifier edited successfully", "Success", { timeOut: 3000 });
-                    fetchModifiersMain(selectedCategoryMain, searchTermMain, currentPageMain, rowsPerPageMain);
-                } else {
-                    toastr.error(response.message || "Failed to edit modifier", "Error", { timeOut: 3000 });
+        if (selectedGroups.length == 0) {
+            $(".modifierNotSelectedAtEdit").removeClass("d-none");
+            $(".modifierNotSelectedAtEdit").addClass("d-block");
+            return;
+        } else {
+            $(".modifierNotSelectedAtEdit").addClass("d-none");
+            $(".modifierNotSelectedAtEdit").removeClass("d-block");
+
+            $.ajax({
+                url: '/Menu/EditModifier',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    console.log("Edit modifier response:", response);
+                    if (response.success) {
+                        openUpdateModifierModal.hide();
+                        $("#modifierGroupContainerEdit").hide();
+                        $('#editModifierForm')[0].reset();
+                        $('#modifierGroupContainerEdit input[name="modifiersViewModel.Modifiergroupid"]').prop('checked', false);
+                        removeBackdrop();
+                        toastr.success(response.message || "Modifier edited successfully", "Success", { timeOut: 3000 });
+                        fetchModifiersMain(selectedCategoryMain, searchTermMain, currentPageMain, rowsPerPageMain);
+                    } else {
+                        toastr.error(response.message || "Failed to edit modifier", "Error", { timeOut: 3000 });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX error - Status:", status, "Error:", error);
+                    toastr.error("Error submitting edit form: " + status, "Error", { timeOut: 3000 });
                 }
-            },
-            error: function (xhr, status, error) {
-                console.error("AJAX error - Status:", status, "Error:", error);
-                toastr.error("Error submitting edit form: " + status, "Error", { timeOut: 3000 });
-            }
-        });
+            });
+        }
     });
 
     // Ensure modifier group container is hidden initially
@@ -1253,11 +1260,11 @@ $(document).ready(function () {
     // Backdrop remove helper
     function removeBackdrop() {
         setTimeout(() => {
-          document.body.classList.remove("modal-open");
-          $(".modal-backdrop").remove();
-          document.body.style.overflow = "auto";
+            document.body.classList.remove("modal-open");
+            $(".modal-backdrop").remove();
+            document.body.style.overflow = "auto";
         }, 300);
-      }
+    }
 
     // Initial fetch
     fetchModifiersMain(selectedCategoryMain, searchTermMain, currentPageMain, rowsPerPageMain);

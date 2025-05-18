@@ -586,7 +586,7 @@ public class MenuController : Controller
                 ? new List<int>()
                 : model.selectedIds.Split(',').Select(int.Parse).ToList();
 
-            model.SelectedModifierIds = modifierIds; // Assuming this property exists in your model
+            model.SelectedModifierIds = modifierIds; 
             await FetchData();
             bool res = await _menuService.AddModifierGroupService(model);
         

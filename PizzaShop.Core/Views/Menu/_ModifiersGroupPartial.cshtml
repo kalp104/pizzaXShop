@@ -263,6 +263,8 @@
                                 }
                             </div>
                             <span asp-validation-for="modifiersViewModel.Modifiergroupid" class="text-danger"></span>
+                            <span class="text-danger modifierNotSelectedAtEdit d-none">Plese select modifier group</span>
+
                         </div>
                         <div class="col-6 form-floating mb-3">
                             <input asp-for="modifiersViewModel.Modifiername" id="editModifierName" type="text"
